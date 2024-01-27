@@ -1,14 +1,15 @@
 import os
 from cli.commands.command import Command
+from cli.exceptions.pvc_already_initalized_exception import PVCAlreadyInitializedException
 
 class Init(Command):
     def __init__(self):
         super().__init__()
 
-    def execute(self):
+    def execute(self,*args, **kwargs):
         """
             Initialize version control on the current directory
-        :return: 0 - command executed successfully, 1 - command execution failed
+        :return: 1 - command executed successfully, 0 - command execution failed
         """
 
         if(self.root_not_exists()):
@@ -20,5 +21,5 @@ class Init(Command):
             status = open(self.status_file, 'w')
             status.close()
         else:
-            return 0
+            raise PVCAlreadyInitializedException()
         return 1

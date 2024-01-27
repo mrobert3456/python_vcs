@@ -1,8 +1,12 @@
 
-from typing import Optional
+from typing import Annotated, List, Optional
+from pathlib import Path
 from cli.commands.init import Init
 from cli.commands.status import Status
+from cli.commands.add import Add
 import typer
+from cli.exceptions.pvc_already_initalized_exception import PVCAlreadyInitializedException
+from cli.exceptions.pvc_not_initialized_exception import PVCNotInitializedException
 
 app = typer.Typer()
 
@@ -16,24 +20,37 @@ def init():
     """
         Initialize version control on the current directory
     """
-    init_command = Init()
-    if(init_command.execute()):
+    try:
+        init_command = Init()
+        init_command.execute()
         print("Version control is initialized successfully")
-    else:
-        print("Version control is already initialized on this project")
-
+    except PVCAlreadyInitializedException as e:
+        print(e)
 
 @app.command()
 def status():
     """
         Shows the current changes
     """
-    status_command = Status()
-    if(status_command.execute()):
-        print("")
-    else:
-        print("Version control system is not initialized")
+    try:
+        status_command = Status()
+        print(status_command.execute())
 
+    except PVCNotInitializedException as e:
+        print(e)
+
+@app.command()
+def add(files: List[Path]):
+    """
+        Adds the specified files and directories into status and staging area
+    """
+    try:
+        add_command = Add()
+        files_to_add = [str(item) for item in files]
+        print(add_command.execute(files=files_to_add))
+        
+    except PVCNotInitializedException as e:
+        print(e)
 
 @app.callback()
 def main(

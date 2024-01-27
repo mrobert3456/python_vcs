@@ -26,7 +26,7 @@ class Command(ABC):
             return True
         return False
 
-    def execute(self):
+    def execute(self,*args, **kwargs):
         """
             Abstract method for executing a command
         """
