@@ -1,6 +1,7 @@
 import os
 from cli.commands.command import Command
 from cli.exceptions.pvc_already_initalized_exception import PVCAlreadyInitializedException
+from datetime import datetime
 
 class Init(Command):
     def __init__(self):
@@ -20,12 +21,14 @@ class Init(Command):
             raise PVCAlreadyInitializedException()
 
     def add_files_to_status(self):
-        for root, directories, files in os.walk(os.getcwd()):
-            if ".pv" in root or ".git" in root:
-                continue
-            
-            for file in files:
-                print(os.path.join(root,file))
+        files_to_track=[os.path.join(root, file) 
+                  for root,directories,files in os.walk(os.getcwd()) 
+                  if ".pv" not in root and ".git" not in root 
+                  for file in files]
+
+        with open(self.status_file,'w') as f:
+            for file in files_to_track:
+                f.writelines(f"{file}|{datetime.now()}\n")
         
     def execute(self,*args, **kwargs):
         """
