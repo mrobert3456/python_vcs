@@ -36,9 +36,16 @@ class Add(Command):
         status_entries = self._get_files_from_status(files_to_add)
 
         with open(self.staging_area_file,"a") as f:
-            for file in status_entries:
-                f.writelines(f"{file}")
+            f.writelines(status_entries)
 
+    def _delete_files_from_status(self,files):
+        files_to_del = self._get_files_from_status(files)
+        with open(self.status_file,"r") as f:
+            files = f.readlines()
+        
+        files_to_keep = [file for file in files if file not in files_to_del]
+        with open(self.status_file,"w") as f:
+            f.writelines(files_to_keep)
 
     def execute(self, files):
         """
@@ -49,6 +56,7 @@ class Add(Command):
             raise PVCNotInitializedException()
 
         self._add_files_to_staging_area(files)
+        self._delete_files_from_status(files)
 
         return 1
 
