@@ -21,9 +21,9 @@ class Init(Command):
             raise PVCAlreadyInitializedException()
 
     def add_files_to_status(self):
-        files_to_track=[os.path.join(root, file) 
-                  for root,directories,files in os.walk(os.getcwd()) 
-                  if ".pv" not in root and ".git" not in root 
+        files_to_track = [os.path.relpath(os.path.join(root, file), os.getcwd())
+                  for root, directories, files in os.walk(os.getcwd())
+                  if ".pv" not in root and ".git" not in root
                   for file in files]
 
         with open(self.status_file,'w') as f:
