@@ -1,6 +1,13 @@
+from enum import Enum
 import os
 from cli.commands.command import Command
 from cli.exceptions.pvc_not_initialized_exception import PVCNotInitializedException
+
+class FileStatus(Enum):
+    CREATED = 1
+    CHANGED = 2
+    DELETED = 3
+
 class Status(Command):
     def __init__(self):
         super().__init__()
