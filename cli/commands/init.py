@@ -2,7 +2,7 @@ import os
 from cli.commands.command import Command
 from cli.exceptions.pvc_already_initalized_exception import PVCAlreadyInitializedException
 from datetime import datetime
-
+from cli.commands.status import FileStatus
 class Init(Command):
     def __init__(self):
         super().__init__()
@@ -28,7 +28,7 @@ class Init(Command):
 
         with open(self.status_file,'w') as f:
             for file in files_to_track:
-                f.writelines(f"{file}|{datetime.now()}\n")
+                f.writelines(f"{file}|{datetime.now()}|{str(FileStatus.CREATED.name)}\n")
         
     def execute(self,*args, **kwargs):
         """
