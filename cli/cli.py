@@ -7,6 +7,7 @@ from cli.commands.add import Add
 import typer
 from cli.exceptions.pvc_already_initalized_exception import PVCAlreadyInitializedException
 from cli.exceptions.pvc_not_initialized_exception import PVCNotInitializedException
+from cli.exceptions.pvc_not_matched_any_files import PVCNotMatchedAnyFiles
 
 app = typer.Typer()
 
@@ -47,9 +48,11 @@ def add(files: List[Path]):
     try:
         add_command = Add()
         files_to_add = [str(item) for item in files]
-        print(add_command.execute(files=files_to_add))
+        add_command.execute(files=files_to_add)
         
     except PVCNotInitializedException as e:
+        print(e)
+    except PVCNotMatchedAnyFiles as e:
         print(e)
 
 @app.callback()
