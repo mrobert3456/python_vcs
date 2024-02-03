@@ -25,6 +25,12 @@ class Add(Command):
     
 
     def _files_are_not_matching(self,files_to_return, files_to_add):
+        """
+            Checks if there are any extra files that has not been added to status, but got specified to being added to staging area.
+            Returns:
+                True -> if there are inconsistencies between the status and to be added files
+                False -> if there is no inconsistencies between the status and to be added files
+        """
         return len(files_to_return)!=len(files_to_add)
 
     def _add_files_to_staging_area(self,files_to_add):
@@ -39,6 +45,9 @@ class Add(Command):
             f.writelines(status_entries)
 
     def _delete_files_from_status(self,files):
+        """
+            Deletes all files added to staging area from status.
+        """
         files_to_del = self._get_files_from_status(files)
         with open(self.status_file,"r") as f:
             files = f.readlines()
@@ -49,7 +58,7 @@ class Add(Command):
 
     def execute(self, files):
         """
-            Adds the specified files and directories into status and staging area
+            Adds the specified files from status into staging area
         :return: 1 - command executed successfully, 0 - command execution failed
         """
         if(self.root_not_exists()):
