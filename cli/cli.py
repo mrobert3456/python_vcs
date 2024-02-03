@@ -35,7 +35,7 @@ def status():
     """
     try:
         status_command = Status()
-        print(status_command.execute())
+        status_command.execute()
 
     except PVCNotInitializedException as e:
         print(e)
@@ -43,7 +43,7 @@ def status():
 @app.command()
 def add(files: List[Path]):
     """
-        Adds the specified files and directories into status and staging area
+        Adds the specified files from status into staging area
     """
     try:
         add_command = Add()
