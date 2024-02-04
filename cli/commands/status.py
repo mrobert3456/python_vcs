@@ -2,6 +2,7 @@ from enum import Enum
 import os
 from cli.commands.command import Command
 from cli.exceptions.pvc_not_initialized_exception import PVCNotInitializedException
+from cli.colors.color_text import TerminalColor, color_text
 
 class FileStatus(Enum):
     CREATED = 1
@@ -21,7 +22,10 @@ class Status(Command):
             staging_area = f.readlines()
         
         if len(status)>0 and len(staging_area)>0:
-            files_to_print = f"Staging area:\n{"\n".join(staging_area)}\nStatus:\n {"\n".join(status)}"
+            staging_area = f"\n{color_text(" ".join(staging_area), TerminalColor.GREEN)}"
+            status = f"\n{color_text(" ".join(status), TerminalColor.RED)} "
+            files_to_print = f"\nStaging area:{staging_area}\nStatus: {status}"
+
         return files_to_print
 
     def execute(self,*args, **kwargs):
