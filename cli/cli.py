@@ -11,8 +11,6 @@ from cli.exceptions.pvc_not_matched_any_files import PVCNotMatchedAnyFiles
 
 app = typer.Typer()
 
-#TODO: exceptions should be catched inside of the execute functions
-
 def print_results(is_success, message):
     if message!=None:
         if is_success:
