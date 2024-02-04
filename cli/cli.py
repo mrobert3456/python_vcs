@@ -5,9 +5,6 @@ from cli.commands.init import Init
 from cli.commands.status import Status
 from cli.commands.add import Add
 import typer
-from cli.exceptions.pvc_already_initalized_exception import PVCAlreadyInitializedException
-from cli.exceptions.pvc_not_initialized_exception import PVCNotInitializedException
-from cli.exceptions.pvc_not_matched_any_files import PVCNotMatchedAnyFiles
 
 app = typer.Typer()
 
