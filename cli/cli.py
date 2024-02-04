@@ -11,6 +11,15 @@ from cli.exceptions.pvc_not_matched_any_files import PVCNotMatchedAnyFiles
 
 app = typer.Typer()
 
+#TODO: exceptions should be catched inside of the execute functions
+
+def print_results(is_success, message):
+    if message!=None:
+        if is_success:
+            print(f"Command executed successfully - {message}")
+        else:
+            print(f"Command execution failed - {message}")
+
 def _version_callback(value: bool) -> None:
     if value:
         typer.echo(f"pvc v1")
@@ -21,39 +30,28 @@ def init():
     """
         Initialize version control on the current directory
     """
-    try:
-        init_command = Init()
-        init_command.execute()
-        print("Version control is initialized successfully")
-    except PVCAlreadyInitializedException as e:
-        print(e)
+    init_command = Init()
+    is_success, message = init_command.execute()
+    print_results(is_success,message)
 
 @app.command()
 def status():
     """
         Shows the current changes
     """
-    try:
-        status_command = Status()
-        status_command.execute()
-
-    except PVCNotInitializedException as e:
-        print(e)
+    status_command = Status()
+    is_success, message = status_command.execute()
+    print_results(is_success,message)
 
 @app.command()
 def add(files: List[Path]):
     """
         Adds the specified files from status into staging area
     """
-    try:
-        add_command = Add()
-        files_to_add = [str(item) for item in files]
-        add_command.execute(files=files_to_add)
-        
-    except PVCNotInitializedException as e:
-        print(e)
-    except PVCNotMatchedAnyFiles as e:
-        print(e)
+    add_command = Add()
+    files_to_add = [str(item) for item in files]
+    is_success, message = add_command.execute(files=files_to_add)
+    print_results(is_success,message)
 
 @app.callback()
 def main(

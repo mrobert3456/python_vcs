@@ -48,11 +48,17 @@ class Init(Command):
     def execute(self,*args, **kwargs):
         """
             Initialize version control on the current directory
-        :return: 1 - command executed successfully, 0 - command execution failed
+        returns: 
+            1 - command executed successfully
+            0 - command execution failed
+            message - command execution result
         """
 
-        self.initiate_file_watcher()
-        self.initialize_directory()
-        self.add_files_to_status()
+        try:
 
-        return 1
+            self.initiate_file_watcher()
+            self.initialize_directory()
+            self.add_files_to_status()
+        except PVCAlreadyInitializedException as e:
+            return 0, e
+        return 1, "Version control is initialized successfully"

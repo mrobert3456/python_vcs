@@ -22,7 +22,7 @@ class Command(ABC):
         return self.base_directory+"/staging_area.txt"
     
     def root_not_exists(self):
-        if  not(os.path.exists(self.base_directory)):
+        if not(os.path.exists(self.base_directory)):
             return True
         return False
 

@@ -59,13 +59,22 @@ class Add(Command):
     def execute(self, files):
         """
             Adds the specified files from status into staging area
-        :return: 1 - command executed successfully, 0 - command execution failed
+        returns: 
+            1 - command executed successfully
+            0 - command execution failed
+            message - command execution result
         """
-        if(self.root_not_exists()):
-            raise PVCNotInitializedException()
 
-        self._add_files_to_staging_area(files)
-        self._delete_files_from_status(files)
+        try:
+            if(self.root_not_exists()):
+                raise PVCNotInitializedException()
 
-        return 1
+            self._add_files_to_staging_area(files)
+            self._delete_files_from_status(files)
+
+        except PVCNotInitializedException as e:
+            return 0, e
+        except PVCNotMatchedAnyFiles as e:
+            return 0, e
+        return 1, None
 
