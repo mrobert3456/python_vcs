@@ -21,11 +21,15 @@ class Status(Command):
         with open(self.staging_area_file,"r") as f:
             staging_area = f.readlines()
         
-        if len(status)>0 and len(staging_area)>0:
-            staging_area = f"\n{color_text(" ".join(staging_area), TerminalColor.GREEN)}"
-            status = f"\n{color_text(" ".join(status), TerminalColor.RED)} "
-            files_to_print = f"\nStaging area:{staging_area}\nStatus: {status}"
+        if len(status) > 0:
+            status = f"\n{color_text(' '.join(status), TerminalColor.RED)} "
+            status_to_print = f"\nStatus: {status}"
 
+        if len(staging_area) > 0:
+            staging_area = f"\n{color_text(' '.join(staging_area), TerminalColor.GREEN)}"
+            staging_to_print = f"\nStaging area: {staging_area}"
+
+        files_to_print = f"{staging_to_print}{status_to_print}"
         return files_to_print
 
     def execute(self,*args, **kwargs):
