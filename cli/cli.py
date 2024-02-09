@@ -4,6 +4,7 @@ from pathlib import Path
 from cli.commands.init import Init
 from cli.commands.status import Status
 from cli.commands.add import Add
+from cli.commands.commit import Commit
 import typer
 
 app = typer.Typer()
@@ -47,6 +48,11 @@ def add(files: List[Path]):
     files_to_add = [str(item) for item in files]
     is_success, message = add_command.execute(files=files_to_add)
     print_results(is_success,message)
+
+@app.command()
+def commit(message):
+    commit_command = Commit()
+    commit_command.execute(message)
 
 @app.callback()
 def main(
