@@ -18,10 +18,17 @@ class CustomHandler(FileSystemEventHandler):
         """
             Adds the created file to status
         """
-        if not event.is_directory:
+        if not event.is_directory and (self.base_directory not in event.src_path):
             with open(self.command.status_file,"a") as f:
-                 f.writelines(f"{event.src_path}|{datetime.now()}|{str(FileStatus.CREATED.name)}")
-        return
+                 f.writelines(f"\n{event.src_path.lstrip("./")}|{datetime.now()}|{str(FileStatus.CREATED.name)}")
+        
+    def on_modified(self, event):
+        #FIX - event is being called twice every time
+        if not event.is_directory and (self.base_directory not in event.src_path):
+            with open(self.command.status_file,"a+") as f:
+                    files =[item.split("|")[0] for item in f.readlines()]
+                    if event.src_path.lstrip("./") not in files:
+                        f.writelines(f"\n{event.src_path.lstrip("./")}|{datetime.now()}|{str(FileStatus.CHANGED.name)}")
 
 def watch_files():
     observer = Observer()
