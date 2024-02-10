@@ -52,7 +52,8 @@ def add(files: List[Path]):
 @app.command()
 def commit(message):
     commit_command = Commit()
-    commit_command.execute(message)
+    is_success, message = commit_command.execute(message)
+    print_results(is_success,message)
 
 @app.callback()
 def main(

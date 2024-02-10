@@ -15,8 +15,9 @@ class Init(Command):
         """
         if(self.root_not_exists()):
             os.mkdir(self.base_directory)
-            os.mkdir(self.commit_directory)
+            os.makedirs(self.commit_directory+"/"+self.current_branch)
             os.mkdir(self.checkout_directory)
+            os.mkdir(self.index_directory)
             staging = open(self.staging_area_file,'w')
             staging.close()
             status = open(self.status_file, 'w')

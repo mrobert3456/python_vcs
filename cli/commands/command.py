@@ -6,6 +6,14 @@ class Command(ABC):
         self.base_directory = ".pv"
 
     @property
+    def current_branch(self):
+        return "main"
+
+    @property
+    def index_directory(self):
+        return self.base_directory+"/index"
+    
+    @property
     def checkout_directory(self):
         return self.base_directory+"/checkout"
 

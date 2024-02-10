@@ -1,6 +1,9 @@
 from cli.commands.command import Command
 from cli.exceptions.pvc_not_initialized_exception import PVCNotInitializedException
 from cli.exceptions.pvc_not_matched_any_files import PVCNotMatchedAnyFiles
+import shutil
+import os
+from pathlib import Path
 class Add(Command):
     def __init__(self):
         super().__init__()
@@ -56,6 +59,19 @@ class Add(Command):
         with open(self.status_file,"w") as f:
             f.writelines(files_to_keep)
 
+    def _add_files_to_index(self):
+        with open(self.staging_area_file,'r') as f:
+            files = f.readlines()
+
+        for file in files:
+            file_path = file.split("|")[0]
+            file_dir ="/".join(file_path.split("\\")[:-1])
+            destination = os.path.join(self.index_directory,file_path).replace("\\","/")
+            if not(os.path.exists(self.index_directory+"/"+file_dir)):
+                os.makedirs(self.index_directory+"/"+file_dir) 
+            shutil.copyfile(file_path, destination)
+
+        
     def execute(self, files):
         """
             Adds the specified files from status into staging area
@@ -71,6 +87,7 @@ class Add(Command):
 
             self._add_files_to_staging_area(files)
             self._delete_files_from_status(files)
+            self._add_files_to_index()
 
         except PVCNotInitializedException as e:
             return 0, e
