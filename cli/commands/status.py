@@ -20,6 +20,9 @@ class Status(Command):
 
         with open(self.staging_area_file,"r") as f:
             staging_area = f.readlines()
+
+        status_to_print=""
+        staging_to_print=""
         
         if len(status) > 0:
             status = f"\n{color_text(' '.join(status), TerminalColor.RED)} "
