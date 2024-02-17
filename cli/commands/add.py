@@ -3,7 +3,7 @@ from cli.exceptions.pvc_not_initialized_exception import PVCNotInitializedExcept
 from cli.exceptions.pvc_not_matched_any_files import PVCNotMatchedAnyFiles
 import shutil
 import os
-from pathlib import Path
+from cli.commands.status import FileStatus
 class Add(Command):
     def __init__(self):
         super().__init__()
@@ -34,7 +34,7 @@ class Add(Command):
                 True -> if there are inconsistencies between the status and to be added files
                 False -> if there is no inconsistencies between the status and to be added files
         """
-        return len(files_to_return)!=len(files_to_add)
+        return len(files_to_return)!=len(files_to_add)                        
 
     def _add_files_to_staging_area(self,files_to_add):
         """
@@ -60,6 +60,7 @@ class Add(Command):
             f.writelines(files_to_keep)
 
     def _add_files_to_index(self):
+        #TODO remove DELETED files from index
         with open(self.staging_area_file,'r') as f:
             files = f.readlines()
 
