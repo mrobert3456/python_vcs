@@ -33,7 +33,7 @@ class Commit(Command):
 
     def _ignore_files(self,directory, contents):
         """
-            Returns what files needs to be ignored from the commit
+            Returns what files needs to be ignored from the commit. Files that are in the index directory but not in the staging area.
         """
         with open(self.staging_area_file,"r") as f:
             lines = f.readlines()
