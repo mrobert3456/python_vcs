@@ -14,25 +14,39 @@ class CustomHandler(FileSystemEventHandler):
     def base_directory(self):
         return self.command.base_directory
 
-    def on_created(self, event):
-        """
-            Adds the created file to status
-        """
-        if not event.is_directory and (self.base_directory not in event.src_path):
-            with open(self.command.status_file,"a") as f:
-                 f.writelines(f"\n{event.src_path.lstrip("./")}|{datetime.now()}|{str(FileStatus.CREATED.name)}")
-        
-    def on_modified(self, event):
-        """
-            Adds the modified file to status
-        """
+    def _add_files_to_status(self,event, status:FileStatus):
         if not event.is_directory and (self.base_directory not in event.src_path):
             with open(self.command.status_file,"a+") as f:
                     f.seek(0)
                     files =[item.split("|")[0] for item in f.readlines()]
                     f.seek(len(files)-1)
                     if event.src_path.lstrip("./") not in files:
-                        f.writelines(f"\n{event.src_path.lstrip("./")}|{datetime.now()}|{str(FileStatus.CHANGED.name)}")
+                        f.writelines(f"\n{event.src_path.lstrip("./")}|{datetime.now()}|{str(status.name)}")
+    
+    def _add_new_file_to_status(self,event):
+        if not event.is_directory and (self.base_directory not in event.src_path):
+            with open(self.command.status_file,"a") as f:
+                 f.writelines(f"\n{event.src_path.lstrip("./")}|{datetime.now()}|{str(FileStatus.CREATED.name)}")
+
+    def on_created(self, event):
+        
+        """
+            Adds the created file to status
+        """
+        self._add_new_file_to_status(event)
+        
+    def on_modified(self, event):
+        """
+            Adds the modified file to status
+        """
+        self._add_files_to_status(event,FileStatus.CHANGED)
+
+    def on_deleted(self, event):
+        """
+            Adds the deleted file to status
+        """
+        self._add_files_to_status(event,FileStatus.DELETED)
+
 
 def watch_files():
     observer = Observer()
