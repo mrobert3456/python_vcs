@@ -31,6 +31,22 @@ class Commit(Command):
         with open(self.staging_area_file,'w') as f:
             f.truncate(0)
 
+    def _ignore_files(self,directory, contents):
+        """
+            Returns what files needs to be ignored from the commit
+        """
+        with open(self.staging_area_file,"r") as f:
+            lines = f.readlines()
+            files_staging = [item.split("|")[0] for item in lines]
+
+        files_index = [os.path.relpath(os.path.join(root, file), self.index_directory)
+                  for root, directories, files in os.walk(self.index_directory)
+                  for file in files]
+        
+        ignore_list = [file_in for file_in in files_index for file_st in files_staging if file_st not in file_in]
+
+        return [item for item in contents if item in ignore_list]
+
     def _commit_files(self, commit_message):
         """
             Commits the files from the staging area.
@@ -40,7 +56,7 @@ class Commit(Command):
         
         if not(os.path.exists(commit_dir)):
             os.mkdir(commit_dir)
-        shutil.copytree(self.index_directory, commit_dir,dirs_exist_ok=True)
+        shutil.copytree(self.index_directory, commit_dir,dirs_exist_ok=True,ignore=self._ignore_files)
         self._write_commit_metadata(commit_dir,commit_message)
        
 
