@@ -23,10 +23,14 @@ class CustomHandler(FileSystemEventHandler):
                  f.writelines(f"\n{event.src_path.lstrip("./")}|{datetime.now()}|{str(FileStatus.CREATED.name)}")
         
     def on_modified(self, event):
-        #FIX - event is being called twice every time
+        """
+            Adds the modified file to status
+        """
         if not event.is_directory and (self.base_directory not in event.src_path):
             with open(self.command.status_file,"a+") as f:
+                    f.seek(0)
                     files =[item.split("|")[0] for item in f.readlines()]
+                    f.seek(len(files)-1)
                     if event.src_path.lstrip("./") not in files:
                         f.writelines(f"\n{event.src_path.lstrip("./")}|{datetime.now()}|{str(FileStatus.CHANGED.name)}")
 
