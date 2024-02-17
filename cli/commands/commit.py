@@ -2,6 +2,7 @@ from cli.commands.command import Command
 import os
 import shutil
 from datetime import datetime
+
 class Commit(Command):
     def __init__(self):
         super().__init__()
@@ -17,20 +18,23 @@ class Commit(Command):
         return len(sub_dirs) + 1
     
     def _write_commit_metadata(self,commit_dir, commit_message):
+        """
+            Saves the message and the date of the commit.
+        """
         with open(commit_dir+"metadata.txt",'w') as f:
             f.writelines(f"{commit_message}|{datetime.now()}")
-        
     
-    #def _get_files_from_staging_area(self):
-    #    with open(self.staging_area_file,'r')as f:
-    #        files = f.readlines()
-    #    return files
-    
-    def _flush_staging_area(self):
+    def _truncate_staging_area(self):
+        """
+            Truncates the staging area after a successfull commit.
+        """
         with open(self.staging_area_file,'w') as f:
             f.truncate(0)
 
     def _commit_files(self, commit_message):
+        """
+            Commits the files from the staging area.
+        """
         commit_version = self._get_commit_version()
         commit_dir =f"{self.commit_directory}/{self.current_branch}/V{commit_version}/"
         
@@ -41,8 +45,12 @@ class Commit(Command):
        
 
     def execute(self, commit_message):
-        
-        #files_to_commit = self._get_files_from_staging_area()
-        self._commit_files(commit_message)
-        self._flush_staging_area()
-        return 1,"Files commited successfully"
+        """
+            Commits the changes.
+        """
+        try:
+            self._commit_files(commit_message)
+            self._truncate_staging_area()
+            return 1,"Files commited successfully"
+        except Exception as e:
+            return 0, e
