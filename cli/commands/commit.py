@@ -43,7 +43,7 @@ class Commit(Command):
                   for root, directories, files in os.walk(self.index_directory)
                   for file in files]
         
-        ignore_list = [file_in for file_in in files_index for file_st in files_staging if file_st not in file_in]
+        ignore_list = [file_in for file_in in files_index if file_in not in files_staging]
 
         return [item for item in contents if item in ignore_list]
 
