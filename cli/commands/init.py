@@ -1,4 +1,5 @@
 import os
+import shutil
 from cli.commands.command import Command
 from cli.exceptions.pvc_already_initalized_exception import PVCAlreadyInitializedException
 from datetime import datetime
@@ -18,6 +19,7 @@ class Init(Command):
             os.makedirs(self.commit_directory+"/"+self.current_branch)
             os.mkdir(self.checkout_directory)
             os.mkdir(self.index_directory)
+            os.mkdir(self.status_directory)
             staging = open(self.staging_area_file,'w')
             staging.close()
             status = open(self.status_file, 'w')
@@ -38,6 +40,14 @@ class Init(Command):
             for file in files_to_track:
                 f.writelines(f"{file}|{datetime.now()}|{str(FileStatus.CREATED.name)}\n")
 
+        #copy files to the status directory
+        for file in files_to_track:
+            file_dir ="/".join(file.split("\\")[:-1])
+            destination = os.path.join(self.status_directory,file).replace("\\","/")
+            if not(os.path.exists(self.status_directory+"/"+file_dir)):
+                os.makedirs(self.status_directory+"/"+file_dir) 
+
+            shutil.copy(file, destination)
     
     def initiate_file_watcher(self):
         """

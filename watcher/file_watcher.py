@@ -1,4 +1,5 @@
 from datetime import datetime
+import shutil
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import os
@@ -13,6 +14,10 @@ class CustomHandler(FileSystemEventHandler):
     @property
     def base_directory(self):
         return self.command.base_directory
+    
+    @property
+    def status_directory(self):
+        return self.command.status_directory
 
     def _add_files_to_status(self,event, status:FileStatus):
         if not event.is_directory and (self.base_directory not in event.src_path):
@@ -20,13 +25,19 @@ class CustomHandler(FileSystemEventHandler):
                     f.seek(0)
                     files =[item.split("|")[0] for item in f.readlines()]
                     f.seek(len(files)-1)
-                    if event.src_path.lstrip("./") not in files:
-                        f.writelines(f"\n{event.src_path.lstrip("./")}|{datetime.now()}|{str(status.name)}")
+                    if event.src_path not in files:
+                        f.writelines(f"\n{event.src_path}|{datetime.now()}|{str(status.name)}")
+                        #move file under status
+                        destination = os.path.join(self.status_directory,event.src_path).replace("\\","/")
+                        shutil.copy(event.src_path, destination)
     
     def _add_new_file_to_status(self,event):
         if not event.is_directory and (self.base_directory not in event.src_path):
             with open(self.command.status_file,"a") as f:
-                 f.writelines(f"\n{event.src_path.lstrip("./")}|{datetime.now()}|{str(FileStatus.CREATED.name)}")
+                f.writelines(f"\n{event.src_path}|{datetime.now()}|{str(FileStatus.CREATED.name)}")
+                #move file under status
+                destination = os.path.join(self.status_directory,event.src_path).replace("\\","/")
+                shutil.copy(event.src_path, destination)
 
     def on_created(self, event):
         

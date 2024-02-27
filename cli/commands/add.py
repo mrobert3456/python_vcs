@@ -59,6 +59,11 @@ class Add(Command):
         with open(self.status_file,"w") as f:
             f.writelines(files_to_keep)
 
+        #delete files under status
+        for to_del in files_to_del:
+            dest = os.path.join(self.status_directory,to_del.split("|")[0]).replace("\\","/")
+            os.remove(dest)
+
     def _add_files_to_index(self):
         #TODO remove DELETED files from index
         with open(self.staging_area_file,'r') as f:

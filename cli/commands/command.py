@@ -14,6 +14,9 @@ class Command(ABC):
         return self.base_directory+"/index"
     
     @property
+    def status_directory(self):
+        return self.base_directory+"/status"
+    @property
     def checkout_directory(self):
         return self.base_directory+"/checkout"
 
