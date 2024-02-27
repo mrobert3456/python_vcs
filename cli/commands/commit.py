@@ -59,14 +59,33 @@ class Commit(Command):
         shutil.copytree(self.index_directory, commit_dir,dirs_exist_ok=True,ignore=self._ignore_files)
         self._write_commit_metadata(commit_dir,commit_message)
        
+    
+    def _sync_local_repo(self):
+        """
+            Syncronize local repository with commits
+        """
+        #NOT FINISHED
+        seen_files = set()
+        commits_dirs = sorted(os.listdir(self.commit_directory+"/"+self.current_branch))
 
+        
+        for dir in commits_dirs:  
+            for parent, directory, files in os.walk(self.commit_directory+"/"+self.current_branch+"/"+dir):
+                for file in files:
+                    if file not in seen_files:
+                        print(os.path.join(parent,file))
+                        seen_files.add(os.path.join(parent,file))
+
+        
+        print(seen_files)
     def execute(self, commit_message):
         """
             Commits the changes.
         """
         try:
-            self._commit_files(commit_message)
-            self._truncate_staging_area()
+            #self._commit_files(commit_message)
+            #self._truncate_staging_area()
+            self._sync_local_repo()
             return 1,"Files commited successfully"
         except Exception as e:
             return 0, e

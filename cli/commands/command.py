@@ -16,6 +16,11 @@ class Command(ABC):
     @property
     def status_directory(self):
         return self.base_directory+"/status"
+    
+    @property
+    def local_repo(self):
+        return self.base_directory+"local_repo"
+    
     @property
     def checkout_directory(self):
         return self.base_directory+"/checkout"
@@ -40,6 +45,12 @@ class Command(ABC):
     def execute(self,*args, **kwargs):
         """
             Abstract method for executing a command
+        """
+        pass
+
+    def undo(self,*args, **kwargs):
+        """
+            Abstract method for undoing an execution
         """
         pass
 

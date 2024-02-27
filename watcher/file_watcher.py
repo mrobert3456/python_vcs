@@ -40,7 +40,6 @@ class CustomHandler(FileSystemEventHandler):
                 shutil.copy(event.src_path, destination)
 
     def on_created(self, event):
-        
         """
             Adds the created file to status
         """
@@ -56,8 +55,9 @@ class CustomHandler(FileSystemEventHandler):
         """
             Adds the deleted file to status
         """
+        #TODO if the file is located in the local repository, then add the file to status directory from the local repo
         self._add_files_to_status(event,FileStatus.DELETED)
-
+    
 
 def watch_files():
     observer = Observer()

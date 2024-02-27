@@ -101,3 +101,9 @@ class Add(Command):
             return 0, e
         return 1, None
 
+    def undo(self, *args, **kwargs):
+        """
+            Discard changes in the working directory
+        """
+            
+        return 0
