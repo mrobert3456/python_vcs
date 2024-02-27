@@ -19,7 +19,7 @@ class Command(ABC):
     
     @property
     def local_repo(self):
-        return self.base_directory+"local_repo"
+        return self.base_directory+"/local_repo"
     
     @property
     def checkout_directory(self):
