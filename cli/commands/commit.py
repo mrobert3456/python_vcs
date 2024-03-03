@@ -3,6 +3,8 @@ import os
 import shutil
 from datetime import datetime
 
+from utils.FileHandler import FileHandler
+
 class Commit(Command):
     def __init__(self):
         super().__init__()
@@ -30,6 +32,8 @@ class Commit(Command):
         """
         with open(self.staging_area_file,'w') as f:
             f.truncate(0)
+
+        FileHandler.truncate_directory(self.index_directory)
 
     def _ignore_files(self,directory, contents):
         """
@@ -65,26 +69,30 @@ class Commit(Command):
             Syncronize local repository with commits
         """
         #NOT FINISHED
-        seen_files = set()
-        commits_dirs = sorted(os.listdir(self.commit_directory+"/"+self.current_branch))
+        seen_files = []
+        commits_dirs = sorted(os.listdir(self.commit_directory+"/"+self.current_branch),reverse=True)
 
-        
+        repo_files = []
+
         for dir in commits_dirs:  
             for parent, directory, files in os.walk(self.commit_directory+"/"+self.current_branch+"/"+dir):
                 for file in files:
-                    if file not in seen_files:
-                        print(os.path.join(parent,file))
-                        seen_files.add(os.path.join(parent,file))
+                    curr_file = "/".join(os.path.join(parent,file).split("\\")[1:])
+                    if curr_file not in seen_files and file not in "metadata.txt":
+                        full_curr_file_path = "/".join(os.path.join(dir,parent,file).split("\\")[1:])
+                        seen_files.append(curr_file)
+                        repo_files.append(full_curr_file_path)
 
-        
-        print(seen_files)
+        for index, file in enumerate(repo_files):
+            #FileHandler.copy_file(file, os.path.join(self.local_repo,self.current_branch,list(seen_files)[index]))
+            shutil.copy(file, os.path.join(self.local_repo,self.current_branch,seen_files[index]))
     def execute(self, commit_message):
         """
             Commits the changes.
         """
         try:
-            #self._commit_files(commit_message)
-            #self._truncate_staging_area()
+            self._commit_files(commit_message)
+            self._truncate_staging_area()
             self._sync_local_repo()
             return 1,"Files commited successfully"
         except Exception as e:

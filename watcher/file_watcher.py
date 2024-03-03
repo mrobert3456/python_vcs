@@ -26,8 +26,9 @@ class CustomHandler(FileSystemEventHandler):
                     files =[item.split("|")[0] for item in f.readlines()]
                     f.seek(len(files)-1)
                     if event.src_path not in files:
-                        f.writelines(f"\n{event.src_path}|{datetime.now()}|{str(status.name)}")
-                        #move file under status
+                        f.writelines(f"\n{event.src_path.replace("./", "")}|{datetime.now()}|{str(status.name)}")
+                    #move file under status
+                    if os.path.exists(event.src_path):
                         destination = os.path.join(self.status_directory,event.src_path).replace("\\","/")
                         shutil.copy(event.src_path, destination)
     
@@ -43,20 +44,30 @@ class CustomHandler(FileSystemEventHandler):
         """
             Adds the created file to status
         """
-        self._add_new_file_to_status(event)
-        
+        try:
+
+            self._add_new_file_to_status(event)
+        except:
+            pass        
     def on_modified(self, event):
         """
             Adds the modified file to status
         """
-        self._add_files_to_status(event,FileStatus.CHANGED)
+        try:
+            self._add_files_to_status(event,FileStatus.CHANGED)
+        except:
+            pass
 
     def on_deleted(self, event):
         """
             Adds the deleted file to status
         """
         #TODO if the file is located in the local repository, then add the file to status directory from the local repo
-        self._add_files_to_status(event,FileStatus.DELETED)
+        try:
+
+            self._add_files_to_status(event,FileStatus.DELETED)
+        except:
+            pass
     
 
 def watch_files():

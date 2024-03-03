@@ -22,6 +22,7 @@ class Init(Command):
             FileHandler.create_directory(self.checkout_directory)
             FileHandler.create_directory(self.index_directory)
             FileHandler.create_directory(self.status_directory)
+            FileHandler.create_directories(self.local_repo+"/"+self.current_branch)
             FileHandler.create_file(self.staging_area_file)
             FileHandler.create_file(self.status_file)
         else:
