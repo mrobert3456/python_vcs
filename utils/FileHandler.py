@@ -14,8 +14,10 @@ class FileHandler:
         shutil.copy(file, destination)
     
     @classmethod
-    def delete_file(cls,file):
-        pass
+    def delete_files(cls,files_to_del,parent_dir):
+        for to_del in files_to_del:
+            dest = os.path.join(parent_dir,to_del.split("|")[0]).replace("\\","/")
+            os.remove(dest)
     
     @classmethod
     def create_directory(cls,dir):
@@ -27,8 +29,9 @@ class FileHandler:
 
     @classmethod
     def read_file(cls,file):
-        pass
-
+        with open(file, "r") as f:
+            lines = f.readlines()
+        return lines
     @classmethod
     def create_file(cls,file):
         cr_file = open(file,'w')

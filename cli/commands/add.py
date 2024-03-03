@@ -3,7 +3,7 @@ from cli.exceptions.pvc_not_initialized_exception import PVCNotInitializedExcept
 from cli.exceptions.pvc_not_matched_any_files import PVCNotMatchedAnyFiles
 import shutil
 import os
-from cli.commands.status import FileStatus
+from utils.FileHandler import FileHandler
 class Add(Command):
     def __init__(self):
         super().__init__()
@@ -16,8 +16,7 @@ class Add(Command):
         returns:
             file entries from status
         """
-        with open(self.status_file, "r") as f:
-            files = f.readlines()
+        files = FileHandler.read_file(self.status_file)
         files_to_return=[file for file in files for file_ta in files_to_add if file_ta in file]
 
         if self._files_are_not_matching(files_to_return, files_to_add):
@@ -43,41 +42,39 @@ class Add(Command):
         files_to_add: file paths that needs to be added in the staging area
         """
         status_entries = self._get_files_from_status(files_to_add)
+        FileHandler.write_file(self.staging_area_file,status_entries)
 
-        with open(self.staging_area_file,"a") as f:
-            f.writelines(status_entries)
 
     def _delete_files_from_status(self,files):
         """
             Deletes all files added to staging area from status.
         """
         files_to_del = self._get_files_from_status(files)
-        with open(self.status_file,"r") as f:
-            files = f.readlines()
-        
+        files = FileHandler.read_file(self.status_file)
         files_to_keep = [file for file in files if file not in files_to_del]
-        with open(self.status_file,"w") as f:
-            f.writelines(files_to_keep)
+        FileHandler.write_file(self.status_file,files_to_keep)
 
         #delete files under status
-        for to_del in files_to_del:
-            dest = os.path.join(self.status_directory,to_del.split("|")[0]).replace("\\","/")
-            os.remove(dest)
+        FileHandler.delete_files(files_to_del,self.status_directory)            
 
     def _add_files_to_index(self):
         #TODO remove DELETED files from index
-        with open(self.staging_area_file,'r') as f:
-            files = f.readlines()
 
+        files = [file.split("|")[0] for file in FileHandler.read_file(self.staging_area_file)]
         for file in files:
-            file_path = file.split("|")[0]
-            file_dir ="/".join(file_path.split("\\")[:-1])
-            destination = os.path.join(self.index_directory,file_path).replace("\\","/")
-            if not(os.path.exists(self.index_directory+"/"+file_dir)):
-                os.makedirs(self.index_directory+"/"+file_dir) 
-            shutil.copyfile(file_path, destination)
+            FileHandler.copy_file(file,self.index_directory)
 
-        
+
+    
+    def _remove_files_from_staging_area(self, files):
+        pass
+
+    def _add_files_to_status(self,files):
+        pass
+
+    def _remove_files_from_index(self,files):
+        pass
+
     def execute(self, files):
         """
             Adds the specified files from status into staging area
@@ -101,9 +98,12 @@ class Add(Command):
             return 0, e
         return 1, None
 
-    def undo(self, *args, **kwargs):
+    def undo(self, files):
         """
             Discard changes in the working directory
         """
+        self._remove_files_from_staging_area(files)
+        self._add_files_to_status(files)
+        self._remove_files_from_index(files)
             
         return 0
