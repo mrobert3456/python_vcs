@@ -1,10 +1,12 @@
 import os
 import shutil
+import shutil
 from cli.commands.command import Command
 from cli.exceptions.pvc_already_initalized_exception import PVCAlreadyInitializedException
 from datetime import datetime
 from cli.commands.status import FileStatus
 import subprocess
+from utils.FileHandler import FileHandler
 class Init(Command):
     def __init__(self):
         super().__init__()
@@ -15,15 +17,13 @@ class Init(Command):
             Creates the neccessary directories for version control.
         """
         if(self.root_not_exists()):
-            os.mkdir(self.base_directory)
-            os.makedirs(self.commit_directory+"/"+self.current_branch)
-            os.mkdir(self.checkout_directory)
-            os.mkdir(self.index_directory)
-            os.mkdir(self.status_directory)
-            staging = open(self.staging_area_file,'w')
-            staging.close()
-            status = open(self.status_file, 'w')
-            status.close()
+            FileHandler.create_directory(self.base_directory)
+            FileHandler.create_directories(self.commit_directory+"/"+self.current_branch)
+            FileHandler.create_directory(self.checkout_directory)
+            FileHandler.create_directory(self.index_directory)
+            FileHandler.create_directory(self.status_directory)
+            FileHandler.create_file(self.staging_area_file)
+            FileHandler.create_file(self.status_file)
         else:
             raise PVCAlreadyInitializedException()
 
@@ -31,24 +31,16 @@ class Init(Command):
         """
             Add the files from the working directory to status.
         """
-        files_to_track = [os.path.relpath(os.path.join(root, file), os.getcwd())
-                  for root, directories, files in os.walk(os.getcwd())
-                  if ".pv" not in root and ".git" not in root
-                  for file in files]
+        files_to_track = FileHandler.get_file_paths_from_dir(os.getcwd())
+        content = [f"{file}|{datetime.now()}|{str(FileStatus.CREATED.name)}\n" for file in files_to_track]
+        FileHandler.write_file(self.status_file,content)
 
-        with open(self.status_file,'w') as f:
-            for file in files_to_track:
-                f.writelines(f"{file}|{datetime.now()}|{str(FileStatus.CREATED.name)}\n")
-
+        
         #copy files to the status directory
         for file in files_to_track:
-            file_dir ="/".join(file.split("\\")[:-1])
-            destination = os.path.join(self.status_directory,file).replace("\\","/")
-            if not(os.path.exists(self.status_directory+"/"+file_dir)):
-                os.makedirs(self.status_directory+"/"+file_dir) 
+            FileHandler.copy_file(file, self.status_directory)
+            
 
-            shutil.copy(file, destination)
-    
     def initiate_file_watcher(self):
         """
             Creates a sub process to watch the working directory for file changes.
