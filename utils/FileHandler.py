@@ -53,3 +53,12 @@ class FileHandler:
                     f.writelines(file)
             else:
                 f.writelines(content)
+    @classmethod
+    def append_file(cls, file_to_write, content):
+        with open(file_to_write,'a+') as f:
+            if type(content) is array.array:
+                for file in file_to_write:
+                    f.writelines(file)
+            else:
+                f.writelines(content)
+        

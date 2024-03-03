@@ -8,6 +8,15 @@ class Add(Command):
     def __init__(self):
         super().__init__()
 
+    def _get_files_from_staging_area(self,files_to_get):
+        files = FileHandler.read_file(self.staging_area_file)
+        files_to_return=[file for file in files for file_ta in files_to_get if file_ta in file]
+        if self._files_are_not_matching(files_to_return, files_to_get):
+            files_not_matched = ', '.join([file_ta for file_ta in files_to_get if not any(file_ta in file for file in files)])
+            raise PVCNotMatchedAnyFiles(files_not_matched)
+           
+        return files_to_return
+
     def _get_files_from_status(self,files_to_add):
         """
         Returns all file entries from status that are needs to be added in the staging area
@@ -42,7 +51,7 @@ class Add(Command):
         files_to_add: file paths that needs to be added in the staging area
         """
         status_entries = self._get_files_from_status(files_to_add)
-        FileHandler.write_file(self.staging_area_file,status_entries)
+        FileHandler.append_file(self.staging_area_file,status_entries)
 
 
     def _delete_files_from_status(self,files):
@@ -67,13 +76,27 @@ class Add(Command):
 
     
     def _remove_files_from_staging_area(self, files):
-        pass
+        files_to_del = self._get_files_from_staging_area(files)
+        files = FileHandler.read_file(self.staging_area_file)
+        files_to_keep = [file for file in files if file not in files_to_del]
+        FileHandler.write_file(self.staging_area_file,files_to_keep)
 
     def _add_files_to_status(self,files):
-        pass
+        staging_files = self._get_files_from_staging_area(files)
+        files = [file.split("|")[0] for file in staging_files]
+        
+        for file in files:
+            FileHandler.copy_file(file,self.status_directory)
+
+        
+        FileHandler.append_file(self.status_file,staging_files)
+
+
 
     def _remove_files_from_index(self,files):
-        pass
+        files_to_del = [file.split("|")[0] for file in self._get_files_from_staging_area(files)]
+        FileHandler.delete_files(files_to_del,self.index_directory)            
+
 
     def execute(self, files):
         """
@@ -102,8 +125,16 @@ class Add(Command):
         """
             Discard changes in the working directory
         """
-        self._remove_files_from_staging_area(files)
-        self._add_files_to_status(files)
-        self._remove_files_from_index(files)
-            
-        return 0
+        try:
+            if(self.root_not_exists()):
+                raise PVCNotInitializedException()
+
+            self._add_files_to_status(files)
+            self._remove_files_from_index(files)
+            self._remove_files_from_staging_area(files)
+
+        except PVCNotInitializedException as e:
+            return 0, e
+        except PVCNotMatchedAnyFiles as e:
+            return 0, e
+        return 1, None

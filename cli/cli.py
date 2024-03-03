@@ -55,6 +55,17 @@ def commit(message):
     is_success, message = commit_command.execute(message)
     print_results(is_success,message)
 
+@app.command()
+def restore(files: List[Path]):
+    """
+        Restore changes from the staging area
+    """
+    add_command = Add()
+    files_to_add = [str(item) for item in files]
+    is_success, message = add_command.undo(files=files_to_add)
+    print_results(is_success,message)
+
+
 @app.callback()
 def main(
     version: Optional[bool] = typer.Option(
