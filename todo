@@ -1,0 +1,10 @@
+- if a file is commited, add it to the index.txt - this will be a lockfile
+- if a file is deleted check if it is in the index.txt
+
+  - if yes, then add the deleted file to status.txt with DELETED status
+    - When you hit restore command, then the file will be restored from the local_repo to the working directory
+    - if you stage this change, then only add the file to the staging_area.txt
+      - if you commit this change, then check the staging area file for DELETED entries and then delete these files from local repo
+
+- FileHandler
+  - refactor copy_file method to not create destination paths
