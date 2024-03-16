@@ -35,7 +35,7 @@ class CustomHandler(FileSystemEventHandler):
     def _add_new_file_to_status(self,event):
         if not event.is_directory and (self.base_directory not in event.src_path):
             with open(self.command.status_file,"a") as f:
-                f.writelines(f"\n{event.src_path}|{datetime.now()}|{str(FileStatus.CREATED.name)}")
+                f.writelines(f"\n{event.src_path.strip("./")}|{datetime.now()}|{str(FileStatus.CREATED.name)}")
                 #move file under status
                 destination = os.path.join(self.status_directory,event.src_path).replace("\\","/")
                 shutil.copy(event.src_path, destination)

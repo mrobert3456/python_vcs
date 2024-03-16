@@ -48,7 +48,6 @@ class Commit(Command):
                   for file in files]
         
         ignore_list = [file_in for file_in in files_index if file_in not in files_staging]
-
         return [item for item in contents if item in ignore_list]
 
     def _commit_files(self, commit_message):
@@ -60,7 +59,7 @@ class Commit(Command):
         
         #add commited files to index-lock-file for tracking
         #TODO check if file is already in index.txt
-        index_files = FileHandler.get_file_paths_from_dir(self.index_directory)
+        index_files = [file+"\n" for file in FileHandler.get_file_paths_from_dir(self.index_directory)]
         FileHandler.append_file(self.index_lock_file,index_files)
 
         #copy staging area files to commit directory
