@@ -1,6 +1,4 @@
 import os
-import shutil
-import shutil
 from cli.commands.command import Command
 from cli.exceptions.pvc_already_initalized_exception import PVCAlreadyInitializedException
 from datetime import datetime
@@ -25,6 +23,7 @@ class Init(Command):
             FileHandler.create_directories(self.local_repo+"/"+self.current_branch)
             FileHandler.create_file(self.staging_area_file)
             FileHandler.create_file(self.status_file)
+            FileHandler.create_file(self.index_lock_file)
         else:
             raise PVCAlreadyInitializedException()
 
@@ -32,7 +31,7 @@ class Init(Command):
         """
             Add the files from the working directory to status.
         """
-        files_to_track = FileHandler.get_file_paths_from_dir(os.getcwd())
+        files_to_track = FileHandler.get_file_paths_from_dir(os.getcwd(),exclude_dirs=['.pv','.git'])
         content = [f"{file}|{datetime.now()}|{str(FileStatus.CREATED.name)}\n" for file in files_to_track]
         FileHandler.write_file(self.status_file,content)
 

@@ -37,6 +37,10 @@ class Command(ABC):
     def staging_area_file(self):
         return self.base_directory+"/staging_area.txt"
     
+    @property
+    def index_lock_file(self):
+        return self.base_directory+"/index.txt"
+    
     def root_not_exists(self):
         if not(os.path.exists(self.base_directory)):
             return True

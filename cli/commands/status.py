@@ -1,5 +1,4 @@
 from enum import Enum
-import os
 from cli.commands.command import Command
 from cli.exceptions.pvc_not_initialized_exception import PVCNotInitializedException
 from cli.colors.color_text import TerminalColor, color_text
@@ -14,6 +13,12 @@ class Status(Command):
         super().__init__()
 
     def _compare_status_and_staging_area(self):
+        """
+            Compares the status and staginga area
+            returns:
+                - files in staging area
+                - files in status
+        """
         
         with open(self.status_file,"r") as f:
             status = f.readlines()

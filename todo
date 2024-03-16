@@ -1,4 +1,4 @@
-- if a file is commited, add it to the index.txt - this will be a lockfile
+- if a file is commited, add it to the index.txt - this will be a lockfile - done
 - if a file is deleted check if it is in the index.txt
 
   - if yes, then add the deleted file to status.txt with DELETED status

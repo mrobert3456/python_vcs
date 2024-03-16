@@ -38,10 +38,10 @@ class FileHandler:
         cr_file.close()
 
     @classmethod
-    def get_file_paths_from_dir(cls,directory):
+    def get_file_paths_from_dir(cls,directory,exclude_dirs=[]):
         files_paths = [os.path.relpath(os.path.join(root, file), directory)
                   for root, directories, files in os.walk(directory)
-                  if ".pv" not in root and ".git" not in root
+                  if all(ex_dir not in root for ex_dir in exclude_dirs)
                   for file in files]
         return files_paths
 

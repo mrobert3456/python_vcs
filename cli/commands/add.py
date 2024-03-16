@@ -1,16 +1,23 @@
 from cli.commands.command import Command
 from cli.exceptions.pvc_not_initialized_exception import PVCNotInitializedException
 from cli.exceptions.pvc_not_matched_any_files import PVCNotMatchedAnyFiles
-import shutil
-import os
 from utils.FileHandler import FileHandler
 class Add(Command):
     def __init__(self):
         super().__init__()
 
     def _get_files_from_staging_area(self,files_to_get):
+        """
+        Returns all files from the staging area that are needs to be discarded
+        params:
+            files_to_get: file paths that needs to be discarded from staging area
+        returns:
+            file entries from staging area
+        """
         files = FileHandler.read_file(self.staging_area_file)
+
         files_to_return=[file for file in files for file_ta in files_to_get if file_ta in file]
+
         if self._files_are_not_matching(files_to_return, files_to_get):
             files_not_matched = ', '.join([file_ta for file_ta in files_to_get if not any(file_ta in file for file in files)])
             raise PVCNotMatchedAnyFiles(files_not_matched)
@@ -63,10 +70,13 @@ class Add(Command):
         files_to_keep = [file for file in files if file not in files_to_del]
         FileHandler.write_file(self.status_file,files_to_keep)
 
-        #delete files under status
+        #delete files under status directory
         FileHandler.delete_files(files_to_del,self.status_directory)            
 
     def _add_files_to_index(self):
+        """
+            Adds files from status to staging area
+        """
         #TODO remove DELETED files from index
 
         files = [file.split("|")[0] for file in FileHandler.read_file(self.staging_area_file)]
@@ -76,12 +86,21 @@ class Add(Command):
 
     
     def _remove_files_from_staging_area(self, files):
+        """
+            Remove the specified files from staging area
+            params:
+                - files: files that needs to be discarded
+        """
         files_to_del = self._get_files_from_staging_area(files)
+
         files = FileHandler.read_file(self.staging_area_file)
         files_to_keep = [file for file in files if file not in files_to_del]
         FileHandler.write_file(self.staging_area_file,files_to_keep)
 
     def _add_files_to_status(self,files):
+        """
+            Adds files from staging area to status
+        """
         staging_files = self._get_files_from_staging_area(files)
         files = [file.split("|")[0] for file in staging_files]
         
@@ -94,6 +113,9 @@ class Add(Command):
 
 
     def _remove_files_from_index(self,files):
+        """
+            Remove discarded files from staging area
+        """
         files_to_del = [file.split("|")[0] for file in self._get_files_from_staging_area(files)]
         FileHandler.delete_files(files_to_del,self.index_directory)            
 

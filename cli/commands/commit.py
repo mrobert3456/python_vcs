@@ -58,9 +58,17 @@ class Commit(Command):
         commit_version = self._get_commit_version()
         commit_dir =f"{self.commit_directory}/{self.current_branch}/V{commit_version}/"
         
+        #add commited files to index-lock-file for tracking
+        #TODO check if file is already in index.txt
+        index_files = FileHandler.get_file_paths_from_dir(self.index_directory)
+        FileHandler.append_file(self.index_lock_file,index_files)
+
+        #copy staging area files to commit directory
         if not(os.path.exists(commit_dir)):
             os.mkdir(commit_dir)
         shutil.copytree(self.index_directory, commit_dir,dirs_exist_ok=True,ignore=self._ignore_files)
+
+
         self._write_commit_metadata(commit_dir,commit_message)
        
     
