@@ -49,7 +49,7 @@ class FileWatcherActions:
                     self.add_deleted_file_to_status(src_path.replace("./", ""))
 
         except Exception as e:
-            print(e)
+            pass
 
 
 
