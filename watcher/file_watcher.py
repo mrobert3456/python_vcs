@@ -1,52 +1,28 @@
-from datetime import datetime
-import shutil
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import os
 from cli.commands.status import FileStatus
 from cli.commands.command import Command
+from watcher.file_watcher_actions import FileWatcherActions
 
 class CustomHandler(FileSystemEventHandler):
     def __init__(self) -> None:
         super().__init__()
         self.command = Command()
+        self.file_handler = FileWatcherActions()
 
     @property
     def base_directory(self):
         return self.command.base_directory
     
-    @property
-    def status_directory(self):
-        return self.command.status_directory
-
-    def _add_files_to_status(self,event, status:FileStatus):
-        if not event.is_directory and (self.base_directory not in event.src_path):
-            with open(self.command.status_file,"a+") as f:
-                    f.seek(0)
-                    files =[item.split("|")[0] for item in f.readlines()]
-                    f.seek(len(files)-1)
-                    if event.src_path not in files:
-                        f.writelines(f"\n{event.src_path.replace("./", "")}|{datetime.now()}|{str(status.name)}")
-                    #move file under status
-                    if os.path.exists(event.src_path):
-                        destination = os.path.join(self.status_directory,event.src_path).replace("\\","/")
-                        shutil.copy(event.src_path, destination)
-    
-    def _add_new_file_to_status(self,event):
-        if not event.is_directory and (self.base_directory not in event.src_path):
-            with open(self.command.status_file,"a") as f:
-                f.writelines(f"\n{event.src_path.strip("./")}|{datetime.now()}|{str(FileStatus.CREATED.name)}")
-                #move file under status
-                destination = os.path.join(self.status_directory,event.src_path).replace("\\","/")
-                shutil.copy(event.src_path, destination)
 
     def on_created(self, event):
         """
             Adds the created file to status
         """
         try:
-
-            self._add_new_file_to_status(event)
+            if not event.is_directory and (self.base_directory not in event.src_path):
+                self.file_handler.add_file_to_status(event.src_path, FileStatus.CREATED)
         except:
             pass        
     def on_modified(self, event):
@@ -54,7 +30,8 @@ class CustomHandler(FileSystemEventHandler):
             Adds the modified file to status
         """
         try:
-            self._add_files_to_status(event,FileStatus.CHANGED)
+            if not event.is_directory and (self.base_directory not in event.src_path):
+                self.file_handler.add_file_to_status(event.src_path, FileStatus.CHANGED)
         except:
             pass
 
@@ -64,8 +41,8 @@ class CustomHandler(FileSystemEventHandler):
         """
         #TODO if the file is located in the local repository, then add the file to status directory from the local repo
         try:
-
-            self._add_files_to_status(event,FileStatus.DELETED)
+            if not event.is_directory and (self.base_directory not in event.src_path):
+                self.file_handler.add_file_to_status(event.src_path, FileStatus.DELETED)
         except:
             pass
     
