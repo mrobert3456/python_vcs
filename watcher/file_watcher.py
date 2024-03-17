@@ -40,7 +40,6 @@ class CustomHandler(FileSystemEventHandler):
         """
             Adds the deleted file to status
         """
-        #TODO if the file is located in the local repository, then add the file to status directory from the local repo
         try:
             if not event.is_directory and (self.base_directory not in event.src_path):
                 self.file_handler.add_file_to_status(event.src_path, FileStatus.DELETED)

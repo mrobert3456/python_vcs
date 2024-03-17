@@ -11,6 +11,7 @@ class FileWatcherActions:
         self.command = Command()
 
     def add_deleted_file_to_status(self, src_path:str):
+        # TODO: This might not be necessary
         index_files = [line.replace("\n","") for line in FileHandler.read_file(self.command.index_lock_file)]
         if src_path in index_files:
             src = os.path.join(self.command.local_repo,self.command.current_branch, src_path).replace("\\","/")
@@ -18,17 +19,25 @@ class FileWatcherActions:
             shutil.copy(src,dest)
 
     def _is_file_exists_in_status(self, src_path:str, files:list[str]) -> bool:
-        
+        """
+            Checks if the given file path is in the given list of file paths
+        """
         return src_path in files
     
     def _get_files_from_status(self,file_handler:TextIOWrapper) -> list[str]:
-            file_handler.seek(0)
-            files =[item.split("|")[0] for item in file_handler.readlines()]
-            file_handler.seek(len(files)-1)
-            return files
+        """
+            gets the file path entries from the status file
+        """
+        file_handler.seek(0)
+        files =[item.split("|")[0] for item in file_handler.readlines()]
+        file_handler.seek(len(files)-1)
+        return files
     
 
     def _is_file_changed(self,src_path:str) -> bool :
+        """
+            Checks wether the given file is modified compared to the file located in local repository
+        """
         local_src_path = os.path.join(self.command.local_repo,self.command.current_branch,src_path)
         local_file_lines = FileHandler.read_file(local_src_path)
         new_file_lines = FileHandler.read_file(src_path)
@@ -36,6 +45,7 @@ class FileWatcherActions:
     
     def add_file_to_status(self,src_path:str,file_status:FileStatus):
         try:
+            #TODO: Separate logic for each file status
             with open(self.command.status_file,"a+") as f:
                 status_files = self._get_files_from_status(f)
                 if not self._is_file_exists_in_status(src_path.replace("./", ""), status_files) and self._is_file_changed(src_path):
