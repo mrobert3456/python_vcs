@@ -65,6 +65,15 @@ def restore(files: List[Path]):
     is_success, message = add_command.undo(files=files_to_add)
     print_results(is_success,message)
 
+@app.command()
+def discard(files: List[Path]):
+    """
+        Discard changes in the working directory
+    """
+    discard_command = Add()
+    files_to_discard = [str(item) for item in files]
+    is_success, message = discard_command.execute(files=files_to_discard)
+    print_results(is_success,message)
 
 @app.callback()
 def main(

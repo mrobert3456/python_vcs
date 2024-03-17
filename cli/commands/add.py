@@ -145,7 +145,7 @@ class Add(Command):
 
     def undo(self, files):
         """
-            Discard changes in the working directory
+            Restore changes from the staging area
         """
         try:
             if(self.root_not_exists()):
