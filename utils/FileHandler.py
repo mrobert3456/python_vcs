@@ -10,7 +10,7 @@ class FileHandler:
         destination = os.path.join(destination_dir,file).replace("\\","/")
         if not(os.path.exists(destination_dir+"/"+file_dir)):
            cls.create_directories(destination_dir+"/"+file_dir)
-    
+
         shutil.copy(file, destination)
     
     @classmethod
@@ -29,9 +29,12 @@ class FileHandler:
 
     @classmethod
     def read_file(cls,file):
-        with open(file, "r") as f:
-            lines = f.readlines()
-        return lines
+        try:
+            with open(file, "r") as f:
+                lines = f.readlines()
+            return lines
+        except Exception as e:
+            return []
     @classmethod
     def create_file(cls,file):
         cr_file = open(file,'w')
@@ -66,3 +69,11 @@ class FileHandler:
     def truncate_directory(cls,dir_path):
         shutil.rmtree(dir_path)
         cls.create_directory(dir_path)
+    
+    @classmethod
+    def delete_directory(cls,dir_path):
+        shutil.rmtree(dir_path)
+    
+    @classmethod
+    def overwrite_file(cls,src,dest):
+        shutil.copy(src,dest)

@@ -30,6 +30,7 @@ class CustomHandler(FileSystemEventHandler):
             Adds the modified file to status
         """
         try:
+            
             if not event.is_directory and (self.base_directory not in event.src_path):
                 self.file_handler.add_file_to_status(event.src_path, FileStatus.CHANGED)
         except:

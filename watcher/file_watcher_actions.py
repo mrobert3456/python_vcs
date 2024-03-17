@@ -27,14 +27,21 @@ class FileWatcherActions:
             file_handler.seek(len(files)-1)
             return files
     
+
+    def _is_file_changed(self,src_path:str) -> bool :
+        local_src_path = os.path.join(self.command.local_repo,self.command.current_branch,src_path)
+        local_file_lines = FileHandler.read_file(local_src_path)
+        new_file_lines = FileHandler.read_file(src_path)
+        return local_file_lines == new_file_lines
+    
     def add_file_to_status(self,src_path:str,file_status:FileStatus):
         try:
             with open(self.command.status_file,"a+") as f:
                 status_files = self._get_files_from_status(f)
-                if not self._is_file_exists_in_status(src_path.replace("./", ""), status_files):
+                if not self._is_file_exists_in_status(src_path.replace("./", ""), status_files) and not self._is_file_changed(src_path):
                     f.writelines(f"\n{src_path.replace("./", "")}|{datetime.now()}|{str(file_status.name)}")
 
-                if file_status!=FileStatus.DELETED and os.path.exists(src_path):
+                if not self._is_file_changed(src_path) and file_status!=FileStatus.DELETED and os.path.exists(src_path):
                     destination = os.path.join(self.command.status_directory,src_path).replace("\\","/")
                     shutil.copy(src_path, destination)
 

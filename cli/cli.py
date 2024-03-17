@@ -5,6 +5,7 @@ from cli.commands.init import Init
 from cli.commands.status import Status
 from cli.commands.add import Add
 from cli.commands.commit import Commit
+from cli.commands.discard import Discard
 import typer
 
 app = typer.Typer()
@@ -70,7 +71,7 @@ def discard(files: List[Path]):
     """
         Discard changes in the working directory
     """
-    discard_command = Add()
+    discard_command = Discard()
     files_to_discard = [str(item) for item in files]
     is_success, message = discard_command.execute(files=files_to_discard)
     print_results(is_success,message)
