@@ -4,15 +4,20 @@ from cli.commands.command import Command
 from datetime import datetime
 import os
 import shutil
+from utils.FileHandler import FileHandler
 class FileWatcherActions:
 
     def __init__(self) -> None:
         self.command = Command()
 
-    def add_new_file_to_status(self):
-        pass
+    def add_deleted_file_to_status(self, src_path:str):
+        index_files = [line.replace("\n","") for line in FileHandler.read_file(self.command.index_lock_file)]
+        if src_path in index_files:
+            src = os.path.join(self.command.local_repo,self.command.current_branch, src_path).replace("\\","/")
+            dest= os.path.join(self.command.status_directory,src_path).replace("\\","/")
+            shutil.copy(src,dest)
 
-    def _is_file_exists_in_status(self, src_path:str, files:list[str]) ->bool:
+    def _is_file_exists_in_status(self, src_path:str, files:list[str]) -> bool:
         
         return src_path in files
     
@@ -29,9 +34,12 @@ class FileWatcherActions:
                 if not self._is_file_exists_in_status(src_path.replace("./", ""), status_files):
                     f.writelines(f"\n{src_path.replace("./", "")}|{datetime.now()}|{str(file_status.name)}")
 
-                if os.path.exists(src_path):
+                if file_status!=FileStatus.DELETED and os.path.exists(src_path):
                     destination = os.path.join(self.command.status_directory,src_path).replace("\\","/")
                     shutil.copy(src_path, destination)
+
+                elif file_status==FileStatus.DELETED:
+                    self.add_deleted_file_to_status(src_path.replace("./", ""))
 
         except Exception as e:
             print(e)
