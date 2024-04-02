@@ -27,12 +27,15 @@ class Init(Command):
         else:
             raise PVCAlreadyInitializedException()
 
+    def return_created_file_metadata(self, files):
+        return [f"{file}|{datetime.now()}|{str(FileStatus.CREATED.name)}\n" for file in files]
+    
     def add_files_to_status(self):
         """
             Add the files from the working directory to status.
         """
         files_to_track = FileHandler.get_file_paths_from_dir(os.getcwd(),exclude_dirs=['.pv','.git'])
-        content = [f"{file}|{datetime.now()}|{str(FileStatus.CREATED.name)}\n" for file in files_to_track]
+        content = self.return_created_file_metadata(files_to_track)
         FileHandler.write_file(self.status_file,content)
 
         
