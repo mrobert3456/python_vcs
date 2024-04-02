@@ -49,13 +49,24 @@ class Add(Command):
                 True -> if there are inconsistencies between the status and to be added files
                 False -> if there is no inconsistencies between the status and to be added files
         """
-        return len(files_to_return)!=len(files_to_add)                        
+        return len(files_to_return)!=len(files_to_add)
+
+    def _add_files_to_index(self):
+        """
+            Adds files from staging area lockfile to index directory
+        """
+        #TODO remove DELETED files from index
+
+        files = [file.split("|")[0] for file in FileHandler.read_file(self.staging_area_file)]
+        for file in files:
+            FileHandler.copy_file(file,self.index_directory)
+                     
 
     def _add_files_to_staging_area(self,files_to_add):
         """
-        Adds the specified files from status to the staging area
+        Adds the specified files from status lockfile to the staging area lockfile
         params:
-        files_to_add: file paths that needs to be added in the staging area
+        files_to_add: file paths that needs to be added in the staging area lockfile
         """
         status_entries = self._get_files_from_status(files_to_add)
         FileHandler.append_file(self.staging_area_file,status_entries)
@@ -73,16 +84,7 @@ class Add(Command):
         #delete files under status directory
         FileHandler.delete_files(files_to_del,self.status_directory)            
 
-    def _add_files_to_index(self):
-        """
-            Adds files from status to staging area
-        """
-        #TODO remove DELETED files from index
-
-        files = [file.split("|")[0] for file in FileHandler.read_file(self.staging_area_file)]
-        for file in files:
-            FileHandler.copy_file(file,self.index_directory)
-
+ 
 
     
     def _remove_files_from_staging_area(self, files):
@@ -99,7 +101,7 @@ class Add(Command):
 
     def _add_files_to_status(self,files):
         """
-            Adds files from staging area to status
+            Adds files from staging area lockfile to status
         """
         staging_files = self._get_files_from_staging_area(files)
         files = [file.split("|")[0] for file in staging_files]
@@ -117,7 +119,7 @@ class Add(Command):
             Remove discarded files from staging area
         """
         files_to_del = [file.split("|")[0] for file in self._get_files_from_staging_area(files)]
-        FileHandler.delete_files(files_to_del,self.index_directory)            
+        FileHandler.delete_files(files_to_del,self.index_directory)         
 
 
     def execute(self, files):

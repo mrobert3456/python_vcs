@@ -57,8 +57,7 @@ class Commit(Command):
         commit_version = self._get_commit_version()
         commit_dir =f"{self.commit_directory}/{self.current_branch}/V{commit_version}/"
         
-        #add commited files to index-lock-file for tracking
-        #TODO check if file is already in index.txt
+        #TODO outsource the index lock file appending to Add command
         index_files = [file+"\n" for file in FileHandler.get_file_paths_from_dir(self.index_directory)]
         FileHandler.append_file(self.index_lock_file,index_files)
 

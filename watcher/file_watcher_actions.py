@@ -49,7 +49,7 @@ class FileWatcherActions:
             with open(self.command.status_file,"a+") as f:
                 status_files = self._get_files_from_status(f)
                 if not self._is_file_exists_in_status(src_path.replace("./", ""), status_files) and self._is_file_changed(src_path):
-                    f.writelines(f"\n{src_path.replace("./", "")}|{datetime.now()}|{str(file_status.name)}")
+                    f.writelines(f"\n{src_path.strip('./')}|{datetime.now()}|{str(file_status.name)}")
 
                 if self._is_file_changed(src_path) and file_status!=FileStatus.DELETED and os.path.exists(src_path):
                     destination = os.path.join(self.command.status_directory,src_path).replace("\\","/")
