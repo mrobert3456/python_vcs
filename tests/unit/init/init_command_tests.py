@@ -40,7 +40,9 @@ class InitTests(TestCase):
        with patch("utils.FileHandler.FileHandler.get_file_paths_from_dir") as files_to_track:
             files_to_track.return_value=["main.py", "vmi.py"]
             content =self.init.return_created_file_metadata(files_to_track.return_value) # should this be mocked??
+            
             self.init.add_files_to_status()
+
             write_file.assert_called_once_with(self.init.status_file,content)
             copy_file.assert_any_call("vmi.py",self.init.status_directory)
             copy_file.assert_any_call("main.py",self.init.status_directory)
