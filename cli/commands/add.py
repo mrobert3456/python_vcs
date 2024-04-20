@@ -82,7 +82,7 @@ class Add(Command):
         FileHandler.write_file(self.status_file,files_to_keep)
 
         #delete files under status directory
-        FileHandler.delete_files(files_to_del,self.status_directory)            
+        FileHandler.delete_files([file.split("|")[0] for file in files_to_del],self.status_directory)            
 
  
 
