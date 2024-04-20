@@ -11,8 +11,8 @@ class InitTests(TestCase):
     @patch("utils.FileHandler.FileHandler.create_directory")
     @patch("utils.FileHandler.FileHandler.create_directories")
     @patch("utils.FileHandler.FileHandler.create_file")
-    @patch("cli.commands.init.Init.root_not_exists",return_value=True)
-    def test_create_directories(self,root_not_exists,create_file,create_dirs,create_dir ):
+    @patch("cli.commands.init.Init.root_not_exists", return_value=True)
+    def test_create_directories(self, root_not_exists, create_file, create_dirs, create_dir ):
         self.init.initialize_directory()
 
         root_not_exists.assert_called_once()
@@ -36,14 +36,14 @@ class InitTests(TestCase):
     
     @patch("utils.FileHandler.FileHandler.copy_file")
     @patch("utils.FileHandler.FileHandler.write_file")
-    def test_add_files_to_status(self,write_file,copy_file):
+    def test_add_files_to_status(self, write_file, copy_file):
        with patch("utils.FileHandler.FileHandler.get_file_paths_from_dir") as files_to_track:
             files_to_track.return_value=["main.py", "vmi.py"]
             content =self.init.return_created_file_metadata(files_to_track.return_value) # should this be mocked??
             
             self.init.add_files_to_status()
 
-            write_file.assert_called_once_with(self.init.status_file,content)
-            copy_file.assert_any_call("vmi.py",self.init.status_directory)
-            copy_file.assert_any_call("main.py",self.init.status_directory)
+            write_file.assert_called_once_with(self.init.status_file, content)
+            copy_file.assert_any_call("vmi.py", self.init.status_directory)
+            copy_file.assert_any_call("main.py", self.init.status_directory)
         
