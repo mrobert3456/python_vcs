@@ -46,4 +46,14 @@ class InitTests(TestCase):
             write_file.assert_called_once_with(self.init.status_file, content)
             copy_file.assert_any_call("vmi.py", self.init.status_directory)
             copy_file.assert_any_call("main.py", self.init.status_directory)
+    
+    @patch("cli.commands.init.Init.initiate_file_watcher")
+    @patch("cli.commands.init.Init.initialize_directory")
+    @patch("cli.commands.init.Init.add_files_to_status")
+    def test_execute(self, add_files, init_dirs, init_watcher):
+        self.init.execute()
+
+        add_files.assert_called_once()
+        init_dirs.assert_called_once()
+        init_watcher.assert_called_once()
         
